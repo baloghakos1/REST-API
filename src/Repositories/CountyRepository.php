@@ -10,6 +10,6 @@ class CountyRepository extends BaseRepository
         $password = self::PASSWORD,
         $database = self::DATABASE)
     {
-        parent::__construct($host, $user, $password,$this->tableName = 'counties');
+    parent::__construct($host, $user, $password,$this->tableName = 'counties' /*$database*/);
     }
 }
