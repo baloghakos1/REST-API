@@ -3,6 +3,7 @@
 namespace App\Html;
 
 use App\Repositories\CountyRepository;
+use App\Repositories\CityRepository;
 
 class Request
 {
@@ -43,8 +44,7 @@ class Request
                     }
                 }
                 Response::response(['id' => $newId], $code);
-                break;
- /*           
+                break;         
             case '/counties/county':
                 if (isset($data['name'])) {
                     $db = new CountyRepository();
@@ -58,7 +58,7 @@ class Request
                     Response::response($entity, 201);
                 }
                 break;
-*/
+
             default:
                 Response::response([], 404, $_SERVER['REQUEST_URI'] . " not found");
         }
@@ -69,6 +69,23 @@ class Request
         switch ($resourceName) {
             case 'counties':
                 $db = new CountyRepository();
+                $resourceId = self::getResourceId();
+                $code = 200;
+                if ($resourceId) {
+                    $entity = $db->find($resourceId);
+                    Response::response($entity, $code);
+                    break;
+                }
+
+                $entities = $db->getAll();                
+                if (empty($entities)) {
+                    $code = 404;
+                }
+                Response::response($entities, $code);
+                break;
+            
+            case 'counties/city':
+                $db = new CityRepository();
                 $resourceId = self::getResourceId();
                 $code = 200;
                 if ($resourceId) {
@@ -124,6 +141,15 @@ class Request
                 }
                 Response::response([], $code);
                 break;
+            case 'counties/city':
+                $code = 404;
+                $db = new CountyRepository();
+                $result = $db->delete($id);
+                if ($result) {
+                    $code = 204;
+                }
+                Response::response([], $code);
+                break;
             default:
                 Response::response([], 404, $_SERVER['REQUEST_URI'] . " not found");
         }
@@ -136,16 +162,33 @@ class Request
 
     private static function putRequest()
     {
-        $uri = $_SERVER['REQUEST_URI'];
-        $putRequestData = self::getRequestData();
-        switch ($uri) {
-            case '/counties/county':
-                $id = $putRequestData['id'];
+        $id = self::getResourceId();
+        if (!$id) {
+            Response::response([],400,Response::STATUSES[400]);
+            return;
+        }
+        $resourceName = self::getResourceName();
+        switch ($resourceName) {
+            case 'counties':
+                $data = self::getRequestData();
                 $db = new CountyRepository();
                 $entity = $db->find($id);
                 $code = 404;
                 if ($entity) {
-                    $result = $db->update($id, ['name' => $putRequestData['name']]);
+                    $result = $db->update($id, ['name' => $data['name']]);
+                    if ($result) {
+                        $code = 201;
+                    }
+                }
+                Response::response([], $code);
+                break;
+            case 'counties/city':
+                $data = self::getRequestData();
+                $db = new CountyRepository();
+                $entity = $db->find($id);
+                $code = 404;
+                if ($entity) {
+                    $result = $db->update($id, ['name' => $data['name']]);
                     if ($result) {
                         $code = 201;
                     }
@@ -153,7 +196,7 @@ class Request
                 Response::response([], $code);
                 break;
             default:
-                Response::response([], 404, "$uri not found");
+                Response::response([], 404, $_SERVER['REQUEST_URI']);
         }
     }
 
