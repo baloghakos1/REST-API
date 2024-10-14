@@ -3,7 +3,6 @@
 namespace App\Html;
 
 use App\Repositories\CountyRepository;
-use App\Repositories\CityRepository;
 
 class Request
 {
@@ -29,6 +28,7 @@ class Request
         }
     }
 
+
     private static function postRequest()
     {
         $resource = self::getResourceName();
@@ -36,65 +36,65 @@ class Request
             case 'counties':
                 $data = self::getRequestData();
                 if (isset($data['name'])) {
-                    $db = new CountyRepository();
-                    $newId = $db->create($data);
+                    $repository = new CountyRepository();
+                    $newId = $repository->create($data);
                     $code = 201;
-                    if (!$newId) {
-                        $code = 400; // Bad request
-                    }
                 }
                 Response::response(['id' => $newId], $code);
-                break;         
-            case '/counties/county':
-                if (isset($data['name'])) {
-                    $db = new CountyRepository();
-                    if (isset($data['id'])) {
-                        $entity = $db->update($data['id'], ['name' => $data['name']]);
-                    }
-                    else {
-                        $id = $db->create(['name' => $data['name']]);
-                        $entity = $db->get($id);
-                    }
-                    Response::response($entity, 201);
-                }
                 break;
 
             default:
                 Response::response([], 404, $_SERVER['REQUEST_URI'] . " not found");
         }
     }
+
+    /**
+     * @api {get} /counties Get list of counties
+     * @apiName index
+     * @apiGroup Counties
+     * @apiVersion 1.0.0
+     *
+     * @apiSuccess {Object[]} counties       List of counties.
+     * @apiSuccess {Number}   counties.id    County id.
+     * @apiSuccess {String}   counties.name  County Name.
+     *
+     * @apiSuccessExample {json} Success-Response:
+     *      HTTP/1.1 200 OK
+     *      {
+     *          "data":[
+     *              {"id":2,"name":"B\u00e1cs-Kiskun"},
+     *              {"id":3,"name":"Baranya"},
+     *              ...
+     *          ],
+     *          "message":"OK",
+     *          "status":200
+     *      }
+     * @apiError NotFound 
+     *
+     * @apiErrorExample Error-Response:
+     *     HTTP/1.1 404 Not Found
+     *     {
+     *          "data":[],
+     *          "message":"Not Found",
+     *          "status":404
+     *      }
+     */
+    
     private static function getRequest()
     {
         $resourceName = self::getResourceName();
         switch ($resourceName) {
             case 'counties':
-                $db = new CountyRepository();
+                $repository = new CountyRepository();
                 $resourceId = self::getResourceId();
                 $code = 200;
                 if ($resourceId) {
-                    $entity = $db->find($resourceId);
+                    $entity = $repository->find($resourceId);
                     Response::response($entity, $code);
                     break;
                 }
 
-                $entities = $db->getAll();                
-                if (empty($entities)) {
-                    $code = 404;
-                }
-                Response::response($entities, $code);
-                break;
-            
-            case 'counties/city':
-                $db = new CityRepository();
-                $resourceId = self::getResourceId();
-                $code = 200;
-                if ($resourceId) {
-                    $entity = $db->find($resourceId);
-                    Response::response($entity, $code);
-                    break;
-                }
-
-                $entities = $db->getAll();                
+                $entities = $repository->getAll();                
                 if (empty($entities)) {
                     $code = 404;
                 }
@@ -106,8 +106,8 @@ class Request
                 $data = self::getRequestData();
                 if (isset($data['needle'])) {
                     $needle = $data['needle'];
-                    $db = new CountyRepository();
-                    $entities = $db->findByName($needle);
+                    $repository = new CountyRepository();
+                    $entities = $repository->findByName($needle);
                     $code = 200;
                     if (empty($entities)) {
                         $code = 404;
@@ -116,13 +116,69 @@ class Request
                 }
                 break;
             default:
-                Response::response(
-                    [], 
-                    404, 
-                    $_SERVER['REQUEST_URI'] . " not found");
+                Response::response([], 404, $_SERVER['REQUEST_URI'] . " not found");
         }
     }
 
+    /**
+     * @api {get} /counties/:id Get single county by :id
+     * @apiParam {Number} id County unique ID.
+     * @apiName getCounty
+     * @apiGroup Counties
+     * @apiVersion 1.0.0 
+     * 
+     * @apiSuccess {Object[]} counties       List of counties.
+     * @apiSuccess {Number}   counties.id    County id.
+     * @apiSuccess {String}   counties.name  County Name.
+     *
+     * @apiSuccessExample {json} Success-Response:
+     *      HTTP/1.1 200 OK
+     *      {
+     *          "data":[
+     *              {"id":3,"name":"Baranya"}
+     *          ],
+     *          "message":"OK",
+     *          "status":200
+     *      }
+     * @apiError NotFound 
+     *
+     * @apiErrorExample Error-Response:
+     *     HTTP/1.1 404 Not Found
+     *     {
+     *          "data":[],
+     *          "message":"Not Found",
+     *          "status":404
+     *      }
+     */
+    function getCounty($id)
+    {
+        return true;
+    }
+    /**
+     * @api {delete} /counties/:id Delete county with :id
+     * @apiParam {Number} id County unique ID.
+     * @apiName delete
+     * @apiGroup Counties
+     * @apiVersion 1.0.0
+     *
+     * @apiSuccessExample {json} Success-Response:
+     *      HTTP/1.1 204 No content
+     *      {
+     *          "data":[],
+     *          "message":"No content",
+     *          "status":204
+     *      }
+     * 
+     * @apiError NotFound 
+     *
+     * @apiErrorExample Error-Response:
+     *     HTTP/1.1 404 Not Found
+     *     {
+     *          "data":[],
+     *          "message":"Not Found",
+     *          "status":404
+     *      } 
+     */
     private static function deleteRequest()
     {
         $id = self::getResourceId();
@@ -134,17 +190,8 @@ class Request
         switch ($resourceName) {
             case 'counties':
                 $code = 404;
-                $db = new CountyRepository();
-                $result = $db->delete($id);
-                if ($result) {
-                    $code = 204;
-                }
-                Response::response([], $code);
-                break;
-            case 'counties/city':
-                $code = 404;
-                $db = new CountyRepository();
-                $result = $db->delete($id);
+                $repository = new CountyRepository();
+                $result = $repository->delete($id);
                 if ($result) {
                     $code = 204;
                 }
@@ -162,41 +209,25 @@ class Request
 
     private static function putRequest()
     {
-        $id = self::getResourceId();
-        if (!$id) {
-            Response::response([],400,Response::STATUSES[400]);
-            return;
-        }
-        $resourceName = self::getResourceName();
-        switch ($resourceName) {
+        $uri = $_SERVER['REQUEST_URI'];
+        $putRequestData = self::getRequestData();
+        $resource = self::getResourceName();
+        switch ($resource) {
             case 'counties':
-                $data = self::getRequestData();
-                $db = new CountyRepository();
-                $entity = $db->find($id);
+                $id = self::getResourceId(); // $putRequestData['id'];
+                $repository = new CountyRepository();
+                $entity = $repository->find($id);
                 $code = 404;
                 if ($entity) {
-                    $result = $db->update($id, ['name' => $data['name']]);
+                    $result = $repository->update($id, ['name' => $putRequestData['name']]);
                     if ($result) {
-                        $code = 201;
-                    }
-                }
-                Response::response([], $code);
-                break;
-            case 'counties/city':
-                $data = self::getRequestData();
-                $db = new CountyRepository();
-                $entity = $db->find($id);
-                $code = 404;
-                if ($entity) {
-                    $result = $db->update($id, ['name' => $data['name']]);
-                    if ($result) {
-                        $code = 201;
+                        $code = 202;
                     }
                 }
                 Response::response([], $code);
                 break;
             default:
-                Response::response([], 404, $_SERVER['REQUEST_URI']);
+                Response::response([], 404, "$uri not found");
         }
     }
 

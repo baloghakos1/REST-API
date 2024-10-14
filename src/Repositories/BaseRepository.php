@@ -7,15 +7,14 @@ use App\Database\DB;
 class BaseRepository extends DB // implements DBInterface
 {
 
-    protected $tableName;
+    protected string $tableName;
 
     /**
      * @param array $data
      * @return void
      */
     public function create(array $data): ?int
-    {
-        $sql = "INSERT INTO `%s` (%s) VALUES (%s)";
+    {        
         $fields = '';
         $values = '';
         foreach ($data as $field => $value) {
@@ -29,6 +28,7 @@ class BaseRepository extends DB // implements DBInterface
             } else
                 $values .= "'$value'";
         }
+        $sql = "INSERT INTO `%s` (%s) VALUES (%s)";
         $sql = sprintf($sql, $this->tableName, $fields, $values);
         $this->mysqli->query($sql);
 
@@ -65,9 +65,7 @@ class BaseRepository extends DB // implements DBInterface
     }
 
     public function update(int $id, array $data)
-    {
-        $query = "UPDATE `{$this->tableName}` SET %s WHERE id = $id;";
-
+    {        
         $set = '';
         foreach ($data as $field => $value) {
             if ($set > '') {
@@ -76,6 +74,7 @@ class BaseRepository extends DB // implements DBInterface
                 $set .= "$field = '$value'";
         }
 
+        $query = "UPDATE `{$this->tableName}` SET %s WHERE id = $id;";
         $query = sprintf($query, $set);
         $this->mysqli->query($query);
 
