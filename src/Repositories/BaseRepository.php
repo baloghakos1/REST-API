@@ -7,7 +7,7 @@ use App\Database\DB;
 class BaseRepository extends DB // implements DBInterface
 {
 
-    protected string $tableName;
+    protected $tableName;
 
     /**
      * @param array $data
