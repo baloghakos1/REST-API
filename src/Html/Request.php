@@ -3,6 +3,7 @@
 namespace App\Html;
 
 use App\Repositories\CountyRepository;
+use App\Repositories\CityRepository;
 
 class Request
 {
@@ -42,7 +43,6 @@ class Request
                 }
                 Response::response(['id' => $newId], $code);
                 break;
-
             default:
                 Response::response([], 404, $_SERVER['REQUEST_URI'] . " not found");
         }
@@ -114,6 +114,22 @@ class Request
                     }
                     Response::response($entities, $code);
                 }
+                break;
+            case 'cities':
+                $repository = new CityRepository();
+                $resourceId = self::getResourceId();
+                $code = 200;
+                if ($resourceId) {
+                    $entity = $repository->find($resourceId);
+                    Response::response($entity, $code);
+                    break;
+                }
+
+                $entities = $repository->getAllByCounty($id);                
+                if (empty($entities)) {
+                    $code = 404;
+                }
+                Response::response($entities, $code);
                 break;
             default:
                 Response::response([], 404, $_SERVER['REQUEST_URI'] . " not found");
