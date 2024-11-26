@@ -125,7 +125,7 @@ class Request
                     break;
                 }
 
-                $entities = $repository->getAllByCounty($id);                
+                $entities = $repository->getAllByCounty();                
                 if (empty($entities)) {
                     $code = 404;
                 }
