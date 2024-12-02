@@ -116,6 +116,7 @@ class Request
                 }
                 break;
             case 'cities':
+                $id = self::getIdFromClient();
                 $repository = new CityRepository();
                 $resourceId = self::getResourceId();
                 $code = 200;
@@ -125,7 +126,7 @@ class Request
                     break;
                 }
 
-                $entities = $repository->getAllByCounty();                
+                $entities = $repository->getAllByCounty($id);                
                 if (empty($entities)) {
                     $code = 404;
                 }
@@ -274,6 +275,15 @@ class Request
 
         return $result;
     }
+
+    private static function getIdFromClient(): ?int
+{
+    $arrUri = self::getArrUri($_SERVER['REQUEST_URI']);
+    if (count($arrUri) > 1 && is_numeric(end($arrUri))) {
+        return (int) end($arrUri);
+    }
+    return NULL;
+}
 
     private static function getFilterData(): array
     {

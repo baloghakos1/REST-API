@@ -70,10 +70,11 @@ class BaseRepository extends DB // implements DBInterface
         return $this->mysqli
             ->query($query)->fetch_all(MYSQLI_ASSOC);
     }
-    public function getAllByCounty(): array
+    public function getAllByCounty($id): array
     {
         $query = "SELECT counties.id, cities.zip_code, cities.city, cities.id_county, cities.id, counties.name FROM cities
         JOIN counties ON counties.id = cities.id_county
+        WHERE cities.id_county = $id
         ORDER BY cities.id";
 
         return $this->mysqli
