@@ -49,6 +49,18 @@ class BaseRepository extends DB // implements DBInterface
         return $result;
     }
 
+    public function find1(int $id): array
+    {
+        $query = $this->select() . "WHERE id_county = $id";
+
+        $result = $this->mysqli->query($query)->fetch_assoc();
+        if (!$result) {
+            $result = [];
+        }
+
+        return $result;
+    }
+
     public function getByName(string $name): array
     {
         $query = $this->select() . "WHERE name = '$name'";
@@ -74,7 +86,7 @@ class BaseRepository extends DB // implements DBInterface
     {
         $query = "SELECT counties.id, cities.zip_code, cities.city, cities.id_county, cities.id, counties.name FROM cities
         JOIN counties ON counties.id = cities.id_county
-        WHERE cities.id_county = $id
+        WHERE cities.id_county = :$id
         ORDER BY cities.id";
 
         return $this->mysqli
