@@ -43,6 +43,15 @@ class Request
                 }
                 Response::response(['id' => $newId], $code);
                 break;
+            case 'cities':
+                $data = self::getRequestData();
+                if (isset($data['city'])) {
+                    $repository = new CityRepository();
+                    $newId = $repository->create($data);
+                    $code = 201;
+                }
+                Response::response(['id' => $newId,  'id_county' => 4], $code);
+                break;
             default:
                 Response::response([], 404, $_SERVER['REQUEST_URI'] . " not found");
         }
@@ -243,12 +252,25 @@ class Request
         $resource = self::getResourceName();
         switch ($resource) {
             case 'counties':
-                $id = self::getResourceId(); // $putRequestData['id'];
+                $id = self::getResourceId();
                 $repository = new CountyRepository();
                 $entity = $repository->find($id);
                 $code = 404;
                 if ($entity) {
                     $result = $repository->update($id, ['name' => $putRequestData['name']]);
+                    if ($result) {
+                        $code = 202;
+                    }
+                }
+                Response::response([], $code);
+                break;
+            case 'cities':
+                $id = self::getResourceId();
+                $repository = new CityRepository();
+                $entity = $repository->find($id);
+                $code = 404;
+                if ($entity) {
+                    $result = $repository->update($id, ['city' => $putRequestData['city'], 'zip_code' => $putRequestData['zip_code']]);
                     if ($result) {
                         $code = 202;
                     }
