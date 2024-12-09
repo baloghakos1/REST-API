@@ -83,7 +83,7 @@ class Request
     private static function getRequest()
     {
         $resourceName = self::getResourceName();
-        $id = 0;
+        $id = self::getResourceId();
         switch ($resourceName) {
             case 'counties':
                 $repository = new CountyRepository();
@@ -119,6 +119,7 @@ class Request
             case 'cities':
                 $repository = new CityRepository();
                 $resourceId = self::getResourceId();
+                $asd = self::getId();
                 $code = 200;
                 if ($resourceId) {
                     $entity = $repository->find($resourceId);
@@ -126,12 +127,14 @@ class Request
                     break;
                 }
 
-                $entities = $repository->getAllByCounty($resourceId);            
+                $entities = $repository->getAllByCounty($asd);            
                 if (empty($entities)) {
                     $code = 404;
                 }
                 Response::response($entities, $code);
                 break;
+            
+            
             default:
                 Response::response([], 404, $_SERVER['REQUEST_URI'] . " not found");
         }
@@ -214,6 +217,15 @@ class Request
                 }
                 Response::response([], $code);
                 break;
+            case 'cities':
+                $code = 404;
+                $repository = new CityRepository();
+                $result = $repository->delete($id);
+                if ($result) {
+                    $code = 204;
+                }
+                Response::response([], $code);
+                break;
             default:
                 Response::response([], 404, $_SERVER['REQUEST_URI'] . " not found");
         }
@@ -282,6 +294,15 @@ class Request
         $result = [];
         $arrUri = self::getArrUri($_SERVER['REQUEST_URI']);
 
+        return $result;
+    }
+
+    private static function getId() {
+        $arrUri = self::getArrUri($_SERVER['REQUEST_URI']);
+        $result = 0;
+        if (is_numeric($arrUri[count($arrUri) - 2])) {
+            $result = $arrUri[count($arrUri) - 2];
+        }
         return $result;
     }
 }
