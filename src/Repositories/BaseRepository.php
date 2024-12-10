@@ -90,6 +90,14 @@ class BaseRepository extends DB // implements DBInterface
             ->query($query)->fetch_all(MYSQLI_ASSOC);
     }
 
+    public function getABC($id) {
+        $query = "SELECT DISTINCT LEFT(city, 1) as abc FROM cities
+            WHERE id_county = $id";
+
+        return $this->mysqli
+            ->query($query)->fetch_all(MYSQLI_ASSOC);
+    }
+
     public function update(int $id, array $data)
     {        
         $set = '';
@@ -145,4 +153,6 @@ class BaseRepository extends DB // implements DBInterface
     public function echo($a) {
         echo var_dump($a);
     }
+
+    
 }
