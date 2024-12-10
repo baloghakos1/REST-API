@@ -98,6 +98,13 @@ class BaseRepository extends DB // implements DBInterface
             ->query($query)->fetch_all(MYSQLI_ASSOC);
     }
 
+    public function getCitiesByABC($id, $betu) {
+        $query = $this->select() . "WHERE id_county = $id AND city LIKE '$betu%'";
+
+        return $this->mysqli
+            ->query($query)->fetch_all(MYSQLI_ASSOC);
+    }
+
     public function update(int $id, array $data)
     {        
         $set = '';

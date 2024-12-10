@@ -160,6 +160,25 @@ class Request
                 }
                 Response::response($entities, $code);
                 break;
+
+            case 'betu':
+                $repository = new CityRepository();
+                $resourceId = self::getResourceId();
+                $asd = self::getId3();
+                $oksa = self::getName();
+                $code = 200;
+                if ($resourceId) {
+                    $entity = $repository->find($resourceId);
+                    Response::response($entity, $code);
+                    break;
+                }
+
+                $entities = $repository->getCitiesByABC($asd, $oksa);            
+                if (empty($entities)) {
+                    $code = 404;
+                }
+                Response::response($entities, $code);
+                break;
             
             
             default:
@@ -352,6 +371,21 @@ class Request
         if (is_numeric($arrUri[count($arrUri) - 3])) {
             $result = $arrUri[count($arrUri) - 3];
         }
+        return $result;
+    }
+
+    private static function getId3() {
+        $arrUri = self::getArrUri($_SERVER['REQUEST_URI']);
+        $result = 0;
+        if (is_numeric($arrUri[count($arrUri) - 4])) {
+            $result = $arrUri[count($arrUri) - 4];
+        }
+        return $result;
+    }
+
+    private static function getName() {
+        $arrUri = self::getArrUri($_SERVER['REQUEST_URI']);
+        $result = $arrUri[count($arrUri) - 2];
         return $result;
     }
 }
