@@ -99,7 +99,8 @@ class BaseRepository extends DB // implements DBInterface
     }
 
     public function getCitiesByABC($id, $betu) {
-        $query = $this->select() . "WHERE id_county = $id AND city LIKE '$betu%'";
+        $jobetu = urldecode($betu);
+        $query = $this->select() . "WHERE id_county = $id AND city LIKE '$jobetu%'";
 
         return $this->mysqli
             ->query($query)->fetch_all(MYSQLI_ASSOC);
