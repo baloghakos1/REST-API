@@ -52,17 +52,6 @@ class BaseRepository extends DB // implements DBInterface
         return $result;
     }
 
-    public function find1(int $id): array
-    {
-        $query = $this->select() . "WHERE id_county = $id";
-
-        $result = $this->mysqli->query($query)->fetch_assoc();
-        if (!$result) {
-            $result = [];
-        }
-
-        return $result;
-    }
 
     public function getByName(string $name): array
     {
@@ -78,36 +67,8 @@ class BaseRepository extends DB // implements DBInterface
         return $this->mysqli
             ->query($query)->fetch_all(MYSQLI_ASSOC);
     }
-    public function getAll1(): array
-    {
-        $query = $this->select();
 
-        return $this->mysqli
-            ->query($query)->fetch_all(MYSQLI_ASSOC);
-    }
-    public function getAllByCounty($id): array
-    {
-        $query = $this->select() . "WHERE id_county = $id";
-
-        return $this->mysqli
-            ->query($query)->fetch_all(MYSQLI_ASSOC);
-    }
-
-    public function getABC($id) {
-        $query = "SELECT DISTINCT LEFT(city, 1) as abc FROM cities
-            WHERE id_county = $id";
-
-        return $this->mysqli
-            ->query($query)->fetch_all(MYSQLI_ASSOC);
-    }
-
-    public function getCitiesByABC($id, $betu) {
-        $jobetu = urldecode($betu);
-        $query = $this->select() . "WHERE id_county = $id AND city LIKE '$jobetu%'";
-
-        return $this->mysqli
-            ->query($query)->fetch_all(MYSQLI_ASSOC);
-    }
+    
 
     public function update(int $id, array $data)
     {        

@@ -88,6 +88,42 @@ class Request
      *          "status":404
      *      }
      */
+
+     /**
+     * @api {get} counties/cities Get list of cities
+     * @apiName index
+     * @apiGroup cities
+     * @apiVersion 1.0.0
+     *
+     * @apiSuccess {Object[]} cities            List of cities.
+     * @apiSuccess {Number}   cities.id         City id.
+     * @apiSuccess {String}   cities.name       City Name.
+     * @apiSuccess {Number}   cities.zip_code   City zip_code.
+     * @apiSuccess {Number}   cities.county_id  City county_id.
+     *
+     * @apiSuccessExample {json} Success-Response:
+     *      HTTP/1.1 200 OK
+     *      {
+     *          "data":[
+     *              {"id":6,"name":"Abaújalpár", "zip_code":3882, "id_county":5},
+     *              {"id":7,"name":"Abaújkér", "zip_code":3882, "id_county":5},
+     *              ...
+     *          ],
+     *          "message":"OK",
+     *          "status":200
+     *      }
+     * @apiError NotFound 
+     *
+     * @apiErrorExample Error-Response:
+     *     HTTP/1.1 404 Not Found
+     *     {
+     *          "data":[],
+     *          "message":"Not Found",
+     *          "status":404
+     *      }
+     */
+
+     //apidoc bef
     
     private static function getRequest()
     {
@@ -216,6 +252,7 @@ class Request
      *          "status":404
      *      }
      */
+    
     function getCounty($id)
     {
         return true;
