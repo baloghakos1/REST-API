@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @author Balogh Ákos
+ * @author Hártó Vince
+ */
 namespace App\Repositories;
 
 use App\Database\DB;
